@@ -148,6 +148,38 @@ def handle_message(chat_id, text):
     send_message(chat_id, reply_for(text))
 
 
+def poll_loop():
+    while True:
+        try:
+            url = f"{API_BASE}/waInstance{INSTANCE}/receiveNotification/{TOKEN}?receiveTimeout=10"
+            req = urllib.request.Request(url)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                raw = resp.read().decode()
+            if not raw or raw == "null":
+                continue
+            data = json.loads(raw)
+            receipt_id = data.get("receiptId")
+            body = data.get("body", {})
+            if body.get("typeWebhook") == "incomingMessageReceived":
+                sender = body.get("senderData", {}).get("chatId", "")
+                msg_data = body.get("messageData", {})
+                if msg_data.get("typeMessage") == "textMessage":
+                    text = msg_data.get("textMessageData", {}).get("textMessage", "")
+                    if sender and text:
+                        threading.Thread(target=handle_message, args=(sender, text), daemon=True).start()
+                elif sender:
+                    send_message(sender, "NIB·BOT: text only for now ✦ send me words.")
+            if receipt_id is not None:
+                del_url = f"{API_BASE}/waInstance{INSTANCE}/deleteNotification/{TOKEN}/{receipt_id}"
+                try:
+                    urllib.request.urlopen(urllib.request.Request(del_url, method="DELETE"), timeout=10).read()
+                except Exception:
+                    pass
+        except Exception as e:
+            print("poll error:", e)
+        time.sleep(1)
+
+
 @app.route("/", methods=["GET"])
 def index():
     return "NIB·BOT is running!", 200
@@ -175,4 +207,5 @@ def green_webhook():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    threading.Thread(target=poll_loop, daemon=True).start()
     app.run(host="0.0.0.0", port=port)
