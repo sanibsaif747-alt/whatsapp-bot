@@ -1,6 +1,5 @@
 import json
 import os
-import re
 import threading
 import time
 import urllib.request
@@ -11,11 +10,9 @@ from flask import Flask, request, jsonify
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG = json.load(open(os.path.join(BASE_DIR, "config.json")))
 
-WHATSAPP_TOKEN = os.environ.get("WHATSAPP_TOKEN", "")
-PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "")
-VERIFY_TOKEN = os.environ.get("VERIFY_TOKEN", "shaaniab-bot-verify-2026")
-
-GRAPH_URL = "https://graph.facebook.com/v21.0"
+INSTANCE = os.environ.get("GREEN_INSTANCE", "")
+TOKEN = os.environ.get("GREEN_TOKEN", "")
+API_BASE = "https://api.green-api.com"
 
 app = Flask(__name__)
 
@@ -24,21 +21,13 @@ conversation_lock = threading.Lock()
 TIMEOUT_SECONDS = 1800
 
 
-def send_message(to, text):
-    url = f"{GRAPH_URL}/{PHONE_NUMBER_ID}/messages"
-    payload = {
-        "messaging_product": "whatsapp",
-        "to": to,
-        "type": "text",
-        "text": {"body": text},
-    }
+def send_message(chat_id, text):
+    url = f"{API_BASE}/waInstance{INSTANCE}/sendMessage/{TOKEN}"
+    payload = {"chatId": chat_id, "message": text}
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode(),
-        headers={
-            "Authorization": f"Bearer {WHATSAPP_TOKEN}",
-            "Content-Type": "application/json",
-        },
+        headers={"Content-Type": "application/json"},
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
@@ -83,7 +72,7 @@ def find_price(text):
     return best
 
 
-def reply_for(text, customer_id):
+def reply_for(text):
     low = text.strip().lower()
 
     if low in ("1", "products", "product", "price", "prices", "rate", "rates", "menu", "catalog"):
@@ -91,7 +80,6 @@ def reply_for(text, customer_id):
 
     if low in ("2", "order", "order karna", "order karni"):
         return "Batao kya chahiye? Item ka naam aur quantity likho.\nExample: '2 atta, 1 milk'"
-        + " Hum confirm karke delivery time batayenge."
 
     if low in ("3", "delivery"):
         return CONFIG["DELIVERY"]
@@ -143,23 +131,23 @@ def reply_for(text, customer_id):
     )
 
 
-def handle_message(sender, text):
+def handle_message(chat_id, text):
     with conversation_lock:
-        state = conversation.get(sender)
+        state = conversation.get(chat_id)
         now = time.time()
         if not state or now - state["ts"] > TIMEOUT_SECONDS:
-            conversation[sender] = {"step": "idle", "ts": now}
-            state = conversation[sender]
+            conversation[chat_id] = {"step": "idle", "ts": now}
+            state = conversation[chat_id]
 
     low = text.strip().lower()
     step = state["step"]
 
     if step == "idle":
-        reply = reply_for(text, sender)
+        reply = reply_for(text)
         if reply.startswith("Order confirm karte"):
             state["step"] = "collecting"
             state["ts"] = time.time()
-        send_message(sender, reply)
+        send_message(chat_id, reply)
         return
 
     if step == "collecting":
@@ -167,11 +155,11 @@ def handle_message(sender, text):
         state["ts"] = time.time()
         try:
             with open(CONFIG["ORDER_STORAGE"], "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()} | {sender} | {text}\n")
+                f.write(f"{datetime.now()} | {chat_id} | {text}\n")
         except Exception as e:
             print("order save failed:", e)
         send_message(
-            sender,
+            chat_id,
             "Order received! ✅\n"
             f"*Your order:* {text}\n"
             f"Delivery: {CONFIG['DELIVERY']}\n"
@@ -181,8 +169,7 @@ def handle_message(sender, text):
         return
 
     if step == "done":
-        reply = reply_for(text, sender)
-        send_message(sender, reply)
+        send_message(chat_id, reply_for(text))
         return
 
 
@@ -191,32 +178,21 @@ def index():
     return "WhatsApp Bot is running!", 200
 
 
-@app.route("/webhook", methods=["GET"])
-def webhook_verify():
-    mode = request.args.get("hub.mode")
-    token = request.args.get("hub.verify_token")
-    challenge = request.args.get("hub.challenge")
-    if mode == "subscribe" and token == VERIFY_TOKEN:
-        return challenge, 200
-    return "Verification failed", 403
-
-
-@app.route("/webhook", methods=["POST"])
-def webhook():
+@app.route("/green-webhook", methods=["POST"])
+def green_webhook():
     data = request.get_json(force=True)
     try:
-        for entry in data.get("entry", []):
-            for change in entry.get("changes", []):
-                if change.get("field") != "messages":
-                    continue
-                value = change.get("value", {})
-                for msg in value.get("messages", []):
-                    if msg.get("type") != "text":
-                        send_message(msg["from"], "Sirf text messages support hain abhi. Apna order text mein likhein.")
-                        continue
-                    sender = msg["from"]
-                    text = msg.get("text", {}).get("body", "")
-                    threading.Thread(target=handle_message, args=(sender, text), daemon=True).start()
+        if data.get("typeWebhook") != "incomingMessageReceived":
+            return jsonify({"status": "ignored"}), 200
+        sender = data.get("senderData", {}).get("chatId", "")
+        msg_data = data.get("messageData", {})
+        if msg_data.get("typeMessage") != "textMessage":
+            send_message(sender, "Sirf text messages support hain abhi. Apna order text mein likhein.")
+            return jsonify({"status": "received"}), 200
+        text = msg_data.get("textMessageData", {}).get("textMessage", "")
+        if not sender or not text:
+            return jsonify({"status": "ignored"}), 200
+        threading.Thread(target=handle_message, args=(sender, text), daemon=True).start()
     except Exception as e:
         print("webhook error:", e)
     return jsonify({"status": "received"}), 200
