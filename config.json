@@ -1,27 +1,38 @@
 {
-  "SHOP_NAME": "Sharma Kirana Store",
-  "SHOP_DESCRIPTION": "Kirana & General Store - sab kuch milta hai. WhatsApp pe order karo!",
-  "ADDRESS": "Near Bus Stand, Main Market, Your City",
-  "UPI_ID": "yourname@upi",
-  "OPEN_TIME": "09:00",
-  "CLOSE_TIME": "21:00",
-  "DELIVERY": "Delivery available in 2 km radius. Extra Rs.20 for far orders.",
-  "CONTACT": "Call: 9876543210",
-  "WELCOME": "Namaste! Welcome to SHOPNAME. Kya chahiye aapko? Neeche options mein se reply karo:\n1. Products & Price\n2. Order karna\n3. Delivery\n4. Shop timing & Address\n5. Payment (UPI)",
-  "CATALOG": [
-    {"name": "Atta (5kg)", "price": "Rs.210"},
-    {"name": "Rice Basmati (5kg)", "price": "Rs.340"},
-    {"name": "Sugar (1kg)", "price": "Rs.42"},
-    {"name": "Dal Toor (1kg)", "price": "Rs.95"},
-    {"name": "Oil Sunflower (1L)", "price": "Rs.115"},
-    {"name": "Milk (1L)", "price": "Rs.60"},
-    {"name": "Bread", "price": "Rs.30"},
-    {"name": "Eggs (12)", "price": "Rs.80"}
+  "OWNER_NAME": "SHAANIB",
+  "OWNER_IG": "@shanib.saifi_",
+  "BOT_NAME": "NIB·BOT",
+  "BOT_TAGLINE": "Your AI chat companion — offline brain, aesthetic soul.",
+  "WELCOME": "✦ SHAA.NIB BOT ✦\n━━━━━━━━━━━━━\nHey, I'm NIB·BOT — SHAANIB's AI companion.\n\nWhat can I do?\n1. ✦ Chat — hang out with me\n2. ✦ Ideas — content / captions / names\n3. ✦ Code — snippets & help\n4. ✦ Mood — motivation & vibes\n5. ✦ Links — my socials\n\nReply with a number or just type freely.\n━━━━━━━━━━━━━\n© @shanib.saifi_",
+  "KEYWORDS_CHAT": ["hi", "hello", "hey", "yo", "namaste", "kaise ho", "whats up", "sup", "hii", "heyy", "good morning", "good evening", "good night"],
+  "KEYWORDS_IDEA": ["idea", "ideas", "suggest", "caption", "content", "name for", "post", "reel", "status", "bio", "slogan"],
+  "KEYWORDS_CODE": ["code", "python", "javascript", "js", "html", "css", "java", "bug", "error", "function", "loop", "app"],
+  "KEYWORDS_MOOD": ["sad", "tired", "bored", "stressed", "lonely", "depressed", "anxious", "motivation", "motivate", "inspire", "happy", "energy"],
+  "KEYWORDS_LINKS": ["instagram", "ig", "social", "link", "follow", "youtube", "username", "your name", "who are you", "about"],
+  "OWNER_BIO": "✦ SHAANIB ✦\n━━━━━━━━━━━━━\nCreator of NIB·BOT 🤖\nBuilding AI & apps — offline first.\n\n✦ Instagram: @shanib.saifi_\n✦ Follow for tech + aesthetic vibes.\n━━━━━━━━━━━━━",
+  "CHAT_LINES": [
+    "NIB·BOT: yo yo yo ✦ good to see you, chief.",
+    "NIB·BOT: chillin' in the cloud, wbu? ☁️",
+    "NIB·BOT: aesthetic > everything. agree?",
+    "NIB·BOT: I think in code & vibes 🤖✨",
+    "NIB·BOT: offline brain, always online for you.",
+    "NIB·BOT: hmm... that's deep. tell me more.",
+    "NIB·BOT: energy level: 100% ⚡",
+    "NIB·BOT: stay golden, my friend. ✦"
   ],
-  "KEYWORDS_PRICE": ["price", "price?", "kitna", "rate", "cost", "cost?", "daam", "bhav", "ke daam"],
-  "KEYWORDS_ORDER": ["order", "order karna", "chahiye", "bhejo", "de do", "lana", "chaiye", "dena", "lenna", "lana hai"],
-  "KEYWORDS_DELIVERY": ["delivery", "home", "ghar", "le kar aao", "kab milega"],
-  "KEYWORDS_TIMING": ["timing", "time", "kab khulta", "kab kholte", "band", "address", "kahan", "location", "kaha ho"],
-  "KEYWORDS_PAYMENT": ["payment", "upi", "pay", "paise", "payment kaise", "phone pe"],
-  "ORDER_STORAGE": "/tmp/orders.txt"
+  "MOTIVATION_LINES": [
+    "NIB·BOT: Listen. You're not here to fit in — you're here to stand out. ✦",
+    "NIB·BOT: Hard days make the best glow-ups. Keep going. 🌱",
+    "NIB·BOT: Every genius was once a beginner. Keep building. 🔨",
+    "NIB·BOT: Your vibe attracts your tribe. Stay authentic. ✨",
+    "NIB·BOT: Failure = feedback. Learn, adjust, dominate. 🚀",
+    "NIB·BOT: Trust the process. Your future self is thanking you. 🤝"
+  ],
+  "IDEA_LINES": [
+    "NIB·BOT: Idea fuel 🔥\n✦ Reel: 'POV: you built an AI that replies for you'\n✦ Caption: 'trained in the shadows, glowing in the light ✦'\n✦ Status: 'offline brain. online vibes.'",
+    "NIB·BOT: Name ideas:\n✦ NIB·BOT\n✦ SHAANI·AI\n✦ The Offline Mind\n✦ VibeCoder",
+    "NIB·BOT: Content idea:\n✦ 'Building apps at 3AM — no wifi needed'\n✦ short + aesthetic = viral potential 📈",
+    "NIB·BOT: Caption ideas:\n✦ 'code in the dark, shine in the light'\n✦ 'made by me, for me, with AI'"
+  ],
+  "ORDER_STORAGE": "/tmp/bot_log.txt"
 }

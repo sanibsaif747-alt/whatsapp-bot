@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import threading
 import time
 import urllib.request
@@ -10,7 +11,7 @@ from flask import Flask, request, jsonify
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIG = json.load(open(os.path.join(BASE_DIR, "config.json")))
 
-INSTANCE = os.environ.get("GREEN_INSTANCE", "")
+INSTANCE = os.environ.get("GREEN_INSTANCE", "710722712388")
 TOKEN = os.environ.get("GREEN_TOKEN", "")
 API_BASE = "https://api.green-api.com"
 
@@ -37,97 +38,91 @@ def send_message(chat_id, text):
         return 0
 
 
-def now_time():
-    return datetime.now().strftime("%H:%M")
-
-
-def is_open():
-    t = now_time()
-    return CONFIG["OPEN_TIME"] <= t <= CONFIG["CLOSE_TIME"]
-
-
 def welcome_text():
-    return CONFIG["WELCOME"].replace("SHOPNAME", CONFIG["SHOP_NAME"])
-
-
-def catalog_text():
-    lines = [f"*{CONFIG['SHOP_NAME']} - Products & Prices:*", ""]
-    for i, item in enumerate(CONFIG["CATALOG"], 1):
-        lines.append(f"{i}. {item['name']} - {item['price']}")
-    lines.append("")
-    lines.append("Order karna hai? Item ka number reply karo. Example: '2 milk'")
-    return "\n".join(lines)
-
-
-def find_price(text):
-    low = text.lower()
-    best = None
-    for item in CONFIG["CATALOG"]:
-        for part in item["name"].lower().split():
-            if part in low:
-                best = item
-                break
-        if best:
-            break
-    return best
+    return CONFIG["WELCOME"]
 
 
 def reply_for(text):
     low = text.strip().lower()
 
-    if low in ("1", "products", "product", "price", "prices", "rate", "rates", "menu", "catalog"):
-        return catalog_text()
+    if low in ("1", "chat", "chat karein", "hang out"):
+        return random.choice(CONFIG["CHAT_LINES"])
 
-    if low in ("2", "order", "order karna", "order karni"):
-        return "Batao kya chahiye? Item ka naam aur quantity likho.\nExample: '2 atta, 1 milk'"
+    if low in ("2", "idea", "ideas", "suggest", "content"):
+        return random.choice(CONFIG["IDEA_LINES"])
 
-    if low in ("3", "delivery"):
-        return CONFIG["DELIVERY"]
-
-    if low in ("4", "timing", "timings", "time", "address", "location"):
+    if low in ("3", "code", "coding", "help code"):
         return (
-            f"*{CONFIG['SHOP_NAME']}*\n"
-            f"Timing: {CONFIG['OPEN_TIME']} - {CONFIG['CLOSE_TIME']} (Mon-Sun)\n"
-            f"Address: {CONFIG['ADDRESS']}\n"
-            f"Contact: {CONFIG['CONTACT']}"
+            "NIB·BOT: code mode on 🤖\n"
+            "Tell me what you need:\n"
+            "✦ 'python loop' — loop examples\n"
+            "✦ 'js function' — JS snippet\n"
+            "✦ 'app idea' — app concepts\n"
+            "✦ or paste your error, I'll decode it."
         )
 
-    if low in ("5", "payment", "upi", "payment kaise"):
-        return f"Payment UPI: *{CONFIG['UPI_ID']}*\nCash bhi available hai.\nKuch aur chahiye?"
+    if low in ("4", "mood", "motivate", "motivation", "vibe"):
+        return random.choice(CONFIG["MOTIVATION_LINES"])
 
-    item = find_price(low)
-    if item:
-        return f"{item['name']} ka price: *{item['price']}*\nOrder karna ho to reply karo 'order {item['name'].lower()}'"
+    if low in ("5", "links", "social", "instagram", "about"):
+        return CONFIG["OWNER_BIO"]
 
-    if any(k in low for k in CONFIG["KEYWORDS_TIMING"]):
+    if low.startswith("python") or "python" in low:
         return (
-            f"Timing: {CONFIG['OPEN_TIME']} - {CONFIG['CLOSE_TIME']} (Mon-Sun)\n"
-            f"Address: {CONFIG['ADDRESS']}"
+            "NIB·BOT: Python snippet 🐍\n"
+            "```python\n"
+            "for i in range(5):\n"
+            "    print('vibe', i)\n"
+            "```\n"
+            "More? type 'python loop' or 'python list'"
         )
 
-    if any(k in low for k in CONFIG["KEYWORDS_PAYMENT"]):
-        return f"Payment UPI: *{CONFIG['UPI_ID']}*\nCash bhi available hai."
-
-    if any(k in low for k in CONFIG["KEYWORDS_DELIVERY"]):
-        return CONFIG["DELIVERY"]
-
-    if any(k in low for k in CONFIG["KEYWORDS_ORDER"]):
+    if low.startswith("js") or "javascript" in low:
         return (
-            "Order confirm karte hain.\n"
-            "Items + quantity batao, aur apna address dena (agar delivery chahiye).\n"
-            "Example: '2 milk, 1 bread - near bus stand'"
+            "NIB·BOT: JS snippet ⚡\n"
+            "```javascript\n"
+            "const vibes = ['aesthetic', 'code', 'glow'];\n"
+            "vibes.forEach(v => console.log(v));\n"
+            "```"
         )
 
-    if any(k in low for k in CONFIG["KEYWORDS_PRICE"]):
-        return catalog_text()
+    if "error" in low or "bug" in low:
+        return (
+            "NIB·BOT: debugging mode 🐛\n"
+            "1. Read the last line of the error — it tells you where.\n"
+            "2. Check variable names (typo = 90% of bugs).\n"
+            "3. Print the value — see what's actually there.\n"
+            "Paste your error here, I'll help decode it."
+        )
+
+    if any(k in low for k in CONFIG["KEYWORDS_MOOD"]):
+        return random.choice(CONFIG["MOTIVATION_LINES"])
+
+    if any(k in low for k in CONFIG["KEYWORDS_IDEA"]):
+        return random.choice(CONFIG["IDEA_LINES"])
+
+    if any(k in low for k in CONFIG["KEYWORDS_CODE"]):
+        return (
+            "NIB·BOT: I know a thing or two 🤖\n"
+            "Ask me: python loop, js function, html page, error help."
+        )
+
+    if any(k in low for k in CONFIG["KEYWORDS_LINKS"]):
+        return CONFIG["OWNER_BIO"]
+
+    if any(k in low for k in CONFIG["KEYWORDS_CHAT"]):
+        return random.choice(CONFIG["CHAT_LINES"])
+
+    if "?" in text or "kya" in low or "what" in low or "kaise" in low:
+        return (
+            "NIB·BOT: good question ✦\n"
+            "I'm a simple bot — chat, ideas, code, vibes.\n"
+            "Type 'menu' to see what I can do."
+        )
 
     return (
-        "Samajh nahi paya. Options:\n"
-        "1. Products & Price\n"
-        "2. Order karna\n"
-        "3. Delivery\n"
-        "4. Timing & Address\n"
-        "5. Payment (UPI)"
+        "NIB·BOT: I vibe with that ✦\n"
+        "Type 'menu' for options, or just keep talking."
     )
 
 
@@ -140,42 +135,22 @@ def handle_message(chat_id, text):
             state = conversation[chat_id]
 
     low = text.strip().lower()
-    step = state["step"]
 
-    if step == "idle":
-        reply = reply_for(text)
-        if reply.startswith("Order confirm karte"):
-            state["step"] = "collecting"
-            state["ts"] = time.time()
-        send_message(chat_id, reply)
+    if low in ("menu", "help", "options", "start", "hi", "hello", "hey", "yo"):
+        send_message(chat_id, welcome_text())
         return
 
-    if step == "collecting":
-        state["step"] = "done"
+    if state["step"] == "idle":
         state["ts"] = time.time()
-        try:
-            with open(CONFIG["ORDER_STORAGE"], "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now()} | {chat_id} | {text}\n")
-        except Exception as e:
-            print("order save failed:", e)
-        send_message(
-            chat_id,
-            "Order received! ✅\n"
-            f"*Your order:* {text}\n"
-            f"Delivery: {CONFIG['DELIVERY']}\n"
-            f"Payment: {CONFIG['UPI_ID']}\n"
-            "Shop aate hi confirm karke time bataenge. Dhanyawad! 🙏",
-        )
-        return
-
-    if step == "done":
         send_message(chat_id, reply_for(text))
         return
+
+    send_message(chat_id, reply_for(text))
 
 
 @app.route("/", methods=["GET"])
 def index():
-    return "WhatsApp Bot is running!", 200
+    return "NIB·BOT is running!", 200
 
 
 @app.route("/green-webhook", methods=["POST"])
@@ -187,7 +162,7 @@ def green_webhook():
         sender = data.get("senderData", {}).get("chatId", "")
         msg_data = data.get("messageData", {})
         if msg_data.get("typeMessage") != "textMessage":
-            send_message(sender, "Sirf text messages support hain abhi. Apna order text mein likhein.")
+            send_message(sender, "NIB·BOT: text only for now ✦ send me words.")
             return jsonify({"status": "received"}), 200
         text = msg_data.get("textMessageData", {}).get("textMessage", "")
         if not sender or not text:
