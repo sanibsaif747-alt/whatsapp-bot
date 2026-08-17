@@ -1,0 +1,27 @@
+{
+  "SHOP_NAME": "Sharma Kirana Store",
+  "SHOP_DESCRIPTION": "Kirana & General Store - sab kuch milta hai. WhatsApp pe order karo!",
+  "ADDRESS": "Near Bus Stand, Main Market, Your City",
+  "UPI_ID": "yourname@upi",
+  "OPEN_TIME": "09:00",
+  "CLOSE_TIME": "21:00",
+  "DELIVERY": "Delivery available in 2 km radius. Extra Rs.20 for far orders.",
+  "CONTACT": "Call: 9876543210",
+  "WELCOME": "Namaste! Welcome to SHOPNAME. Kya chahiye aapko? Neeche options mein se reply karo:\n1. Products & Price\n2. Order karna\n3. Delivery\n4. Shop timing & Address\n5. Payment (UPI)",
+  "CATALOG": [
+    {"name": "Atta (5kg)", "price": "Rs.210"},
+    {"name": "Rice Basmati (5kg)", "price": "Rs.340"},
+    {"name": "Sugar (1kg)", "price": "Rs.42"},
+    {"name": "Dal Toor (1kg)", "price": "Rs.95"},
+    {"name": "Oil Sunflower (1L)", "price": "Rs.115"},
+    {"name": "Milk (1L)", "price": "Rs.60"},
+    {"name": "Bread", "price": "Rs.30"},
+    {"name": "Eggs (12)", "price": "Rs.80"}
+  ],
+  "KEYWORDS_PRICE": ["price", "price?", "kitna", "rate", "cost", "cost?", "daam", "bhav", "ke daam"],
+  "KEYWORDS_ORDER": ["order", "order karna", "chahiye", "bhejo", "de do", "lana", "chaiye", "dena", "lenna", "lana hai"],
+  "KEYWORDS_DELIVERY": ["delivery", "home", "ghar", "le kar aao", "kab milega"],
+  "KEYWORDS_TIMING": ["timing", "time", "kab khulta", "kab kholte", "band", "address", "kahan", "location", "kaha ho"],
+  "KEYWORDS_PAYMENT": ["payment", "upi", "pay", "paise", "payment kaise", "phone pe"],
+  "ORDER_STORAGE": "/tmp/orders.txt"
+}
